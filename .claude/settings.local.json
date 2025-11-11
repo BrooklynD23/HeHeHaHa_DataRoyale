@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if [ -d \".venv\" ])",
+      "Bash(then echo \"Virtual environment exists\")",
+      "Bash(fi)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,11 @@
+# Jupytext configuration for better Git collaboration
+# Notebooks are paired with .py files for readable diffs
+
+# Default formats for all notebooks
+formats = "ipynb,py:percent"
+
+# Notebook metadata to include in .py files
+notebook_metadata_filter = "all"
+
+# Cell metadata to preserve
+cell_metadata_filter = "all,-execution,-autoscroll,-collapsed,-scrolled,-trusted"
