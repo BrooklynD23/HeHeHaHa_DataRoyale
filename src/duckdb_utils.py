@@ -29,31 +29,65 @@ def create_battles_view(
     con: duckdb.DuckDBPyConnection,
     csv_path: str = 'battles.csv',
     view_name: str = 'battles',
-    sample_size: int = -1
+    sample_size: int = -1,
+    prefer_parquet: bool = True
 ) -> None:
     """
-    Create a view over the battles CSV file.
+    Create a view over the battles dataset (CSV or Parquet).
+
+    Automatically uses Parquet if available (faster), otherwise falls back to CSV.
+    Parquet files are typically 5-10x smaller and 10-50x faster for queries.
 
     Args:
         con: DuckDB connection
-        csv_path: Path to battles.csv file
+        csv_path: Path to battles.csv file (or battles.parquet)
         view_name: Name for the view (default: 'battles')
-        sample_size: Number of rows to sample for type inference (-1 = all)
+        sample_size: Number of rows to sample for type inference (-1 = all, CSV only)
+        prefer_parquet: If True, automatically look for .parquet version of file
 
     Example:
         >>> con = get_connection()
-        >>> create_battles_view(con, 'battles.csv')
+        >>> create_battles_view(con, 'battles.csv')  # Uses battles.parquet if exists
         >>> df = con.sql("SELECT COUNT(*) FROM battles").df()
     """
-    con.execute(f"""
-        CREATE OR REPLACE VIEW {view_name} AS
-        SELECT * FROM read_csv_auto('{csv_path}',
-            SAMPLE_SIZE={sample_size},
-            IGNORE_ERRORS=true,
-            hive_partitioning=0
-        )
-    """)
-    print(f"✓ Created view '{view_name}' from {csv_path}")
+    import os
+    
+    # Normalize path for DuckDB (forward slashes, escape quotes)
+    def normalize_path(path: str) -> str:
+        return path.replace("\\", "/").replace("'", "''")
+    
+    # Check for Parquet version if prefer_parquet is True
+    file_path = csv_path
+    if prefer_parquet and csv_path.endswith('.csv'):
+        parquet_path = csv_path.replace('.csv', '.parquet')
+        if os.path.exists(parquet_path):
+            file_path = parquet_path
+            print(f"✓ Found Parquet file: {parquet_path} (using this for faster queries)")
+    
+    # Determine file type and create appropriate view
+    if file_path.endswith('.parquet'):
+        # Use Parquet (faster, compressed)
+        file_path_norm = normalize_path(file_path)
+        con.execute(f"""
+            CREATE OR REPLACE VIEW {view_name} AS
+            SELECT * FROM read_parquet('{file_path_norm}')
+        """)
+        print(f"✓ Created view '{view_name}' from Parquet: {file_path}")
+    else:
+        # Use CSV (slower but no conversion needed)
+        file_path_norm = normalize_path(file_path)
+        con.execute(f"""
+            CREATE OR REPLACE VIEW {view_name} AS
+            SELECT * FROM read_csv_auto('{file_path_norm}',
+                SAMPLE_SIZE={sample_size},
+                IGNORE_ERRORS=true,
+                hive_partitioning=0
+            )
+        """)
+        print(f"✓ Created view '{view_name}' from CSV: {file_path}")
+        if prefer_parquet:
+            print(f"  💡 Tip: Convert to Parquet for 10-50x faster queries:")
+            print(f"     python convert_to_parquet.py --input {file_path}")
 
 
 def query_to_df(
@@ -188,15 +222,19 @@ def get_schema(con: duckdb.DuckDBPyConnection, view_name: str = 'battles') -> pd
 def get_null_counts(
     con: duckdb.DuckDBPyConnection,
     view_name: str = 'battles',
-    columns: Optional[list] = None
+    columns: Optional[list] = None,
+    batch_size: int = 20
 ) -> pd.DataFrame:
     """
     Get null counts for all columns (or specified columns).
+    
+    Processes columns in batches to avoid buffer overflow on large datasets.
 
     Args:
         con: DuckDB connection
         view_name: Name of the view
         columns: List of column names to check (None = all columns)
+        batch_size: Number of columns to process per batch (default: 20)
 
     Returns:
         DataFrame with columns: column_name, null_count, null_percentage
@@ -206,32 +244,42 @@ def get_null_counts(
         schema = con.sql(f"DESCRIBE {view_name}").df()
         columns = schema['column_name'].tolist()
 
-    # Build query to count nulls for each column
-    null_checks = [
-        f'SUM(CASE WHEN "{col}" IS NULL THEN 1 ELSE 0 END) as "{col}_nulls"'
-        for col in columns
-    ]
+    # Get total row count once
+    total_rows_result = con.sql(f"SELECT COUNT(*) as total_rows FROM {view_name}").df()
+    total_rows = total_rows_result['total_rows'].iloc[0]
 
-    query = f"""
-        SELECT
-            COUNT(*) as total_rows,
-            {', '.join(null_checks)}
-        FROM {view_name}
-    """
-
-    result = con.sql(query).df()
-    total_rows = result['total_rows'].iloc[0]
-
-    # Reshape to long format
+    # Process columns in batches to avoid buffer overflow
     null_data = []
-    for col in columns:
-        null_count = result[f'{col}_nulls'].iloc[0]
-        null_pct = (null_count / total_rows) * 100
-        null_data.append({
-            'column_name': col,
-            'null_count': null_count,
-            'null_percentage': null_pct
-        })
+    num_batches = (len(columns) + batch_size - 1) // batch_size
+    
+    for batch_idx in range(num_batches):
+        start_idx = batch_idx * batch_size
+        end_idx = min(start_idx + batch_size, len(columns))
+        batch_columns = columns[start_idx:end_idx]
+        
+        # Build query to count nulls for this batch of columns
+        null_checks = [
+            f'SUM(CASE WHEN "{col}" IS NULL THEN 1 ELSE 0 END) as "{col}_nulls"'
+            for col in batch_columns
+        ]
+
+        query = f"""
+            SELECT
+                {', '.join(null_checks)}
+            FROM {view_name}
+        """
+
+        result = con.sql(query).df()
+        
+        # Process results for this batch
+        for col in batch_columns:
+            null_count = result[f'{col}_nulls'].iloc[0]
+            null_pct = (null_count / total_rows) * 100
+            null_data.append({
+                'column_name': col,
+                'null_count': null_count,
+                'null_percentage': null_pct
+            })
 
     null_df = pd.DataFrame(null_data).sort_values('null_percentage', ascending=False)
 

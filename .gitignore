@@ -5,12 +5,14 @@ env/
 
 # Large data files
 battles.csv
+battles.parquet
 *.csv.gz
 
 # Intermediate artifacts (share via Google Drive instead)
 artifacts/*.parquet
 artifacts/*.csv
 artifacts/*.feather
+notebooks/artifacts/
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/

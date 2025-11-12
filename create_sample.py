@@ -2,7 +2,7 @@
 """
 create_sample.py
 
-Generate a stratified sample of the battles.csv dataset for faster iteration.
+Generate a stratified sample of the battles dataset (Parquet or CSV) for faster iteration.
 
 Usage:
     python create_sample.py [--pct PERCENTAGE] [--stratify COLUMN]
@@ -26,7 +26,7 @@ from duckdb_utils import get_connection, create_battles_view, create_sample
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Create a sample of battles.csv for faster analysis'
+        description='Create a sample of battles dataset (Parquet or CSV) for faster analysis'
     )
     parser.add_argument(
         '--pct',
@@ -47,24 +47,36 @@ def main():
         help='Output file path (default: artifacts/sample_battles_10pct.parquet)'
     )
     parser.add_argument(
-        '--csv',
+        '--input',
         type=str,
-        default='battles.csv',
-        help='Path to battles.csv (default: battles.csv)'
+        default=None,
+        help='Path to battles.parquet or battles.csv (default: auto-detect battles.parquet)'
     )
 
     args = parser.parse_args()
 
-    # Check if CSV exists
-    if not os.path.exists(args.csv):
-        print(f"❌ ERROR: {args.csv} not found!")
-        print(f"\nPlease ensure battles.csv is in the current directory.")
+    # Auto-detect input file (prefer Parquet, fallback to CSV)
+    if args.input is None:
+        if os.path.exists('battles.parquet'):
+            args.input = 'battles.parquet'
+            print("Using battles.parquet (auto-detected)")
+        elif os.path.exists('battles.csv'):
+            args.input = 'battles.csv'
+            print("Using battles.csv (auto-detected, Parquet not found)")
+        else:
+            print("[ERROR] Neither battles.parquet nor battles.csv found!")
+            print(f"Current directory: {os.getcwd()}")
+            sys.exit(1)
+    
+    # Check if input file exists
+    if not os.path.exists(args.input):
+        print(f"[ERROR] {args.input} not found!")
         print(f"Current directory: {os.getcwd()}")
         sys.exit(1)
 
     # Get file size
-    file_size_gb = os.path.getsize(args.csv) / (1024**3)
-    print(f"Input file: {args.csv} ({file_size_gb:.2f} GB)")
+    file_size_gb = os.path.getsize(args.input) / (1024**3)
+    print(f"Input file: {args.input} ({file_size_gb:.2f} GB)")
     print(f"Sample percentage: {args.pct}%")
     print(f"Output: {args.output}")
     if args.stratify:
@@ -74,9 +86,9 @@ def main():
     print("\nConnecting to DuckDB...")
     con = get_connection()
 
-    # Create view
-    print("Creating view over CSV...")
-    create_battles_view(con, args.csv)
+    # Create view (automatically uses Parquet if available)
+    print("Creating view over dataset...")
+    create_battles_view(con, args.input)
 
     # Create sample
     print(f"\nGenerating {args.pct}% sample...")
@@ -102,7 +114,7 @@ def main():
     print(f"\nNext steps:")
     print(f"  1. Use this sample in Jupyter notebooks for fast iteration")
     print(f"  2. Upload to Google Drive for Colab access")
-    print(f"  3. Run full queries on battles.csv only when needed")
+    print(f"  3. Run full queries on battles.parquet for faster performance")
 
 
 if __name__ == '__main__':
