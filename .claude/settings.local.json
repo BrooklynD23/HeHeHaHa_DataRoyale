@@ -1,0 +1,26 @@
+{
+  "env": {
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(if [ -d \".venv\" ])",
+      "Bash(then echo \"Virtual environment exists\")",
+      "Bash(fi)",
+      "WebSearch",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git config:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(then)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(else)",
+      "Bash(/mnt/c/Users/Danny/AppData/Local/Programs/Python/Python313/python.exe:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

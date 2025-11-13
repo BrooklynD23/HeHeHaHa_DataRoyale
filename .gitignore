@@ -1,0 +1,57 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Large data files
+battles.csv
+battles.parquet
+*.csv.gz
+
+# Intermediate artifacts (share via Google Drive instead)
+artifacts/*.parquet
+artifacts/*.csv
+artifacts/*.feather
+notebooks/artifacts/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Presentation outputs (keep source, ignore exports)
+presentation/figures/*.png
+presentation/figures/*.jpg
+presentation/figures/*.svg
+presentation/*.pdf
+
+# Jupyter outputs (jupytext will handle)
+notebooks/*.nbconvert.ipynb
+
+# Model artifacts
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# Logs
+*.log
+logs/
