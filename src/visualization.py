@@ -49,8 +49,15 @@ def save_figure(filename: str, dpi: int = 300, bbox_inches: str = 'tight'):
         dpi: Resolution (300 for high quality)
         bbox_inches: 'tight' to remove whitespace
     """
-    plt.savefig(f'presentation/figures/{filename}', dpi=dpi, bbox_inches=bbox_inches)
-    print(f"✓ Saved to presentation/figures/{filename}")
+    import os
+    # Find project root (go up from src/ to project root)
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    figures_dir = os.path.join(project_root, 'presentation', 'figures')
+    os.makedirs(figures_dir, exist_ok=True)
+
+    output_path = os.path.join(figures_dir, filename)
+    plt.savefig(output_path, dpi=dpi, bbox_inches=bbox_inches)
+    print(f"✓ Saved to {output_path}")
 
 
 def plot_win_rate_comparison(
