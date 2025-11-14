@@ -1,8 +1,8 @@
 # DataRoyale - Clash Royale Data Analysis Competition
 
-**Competition**: Data Science Presentation Competition
-**Deadline**: Friday the 14th, 11:30 AM
-**Judging**: Friday the 14th, 12:15 PM
+**Competition**: Data Science Presentation Competition  
+**Deadline**: Friday the 14th, 11:30 AM  
+**Judging**: Friday the 14th, 12:15 PM  
 **Format**: 8-minute presentation + 2-4 min Q&A
 
 ## Quick Start
@@ -95,8 +95,38 @@ DataRoyale/
     └── slides.pptx               # Final presentation deck
 ```
 
+## Workflow
 
-**NEVER** load full CSV into memory! Always use DuckDB:
+### Phase 1: Setup & Exploration 
+1. Run `00-setup-and-validation.ipynb` - Verify environment
+2. Run `01-data-profiling.ipynb` - Understand data quality
+3. Generate sample: `python create_sample.py`
+4. Upload sample to Google Drive for team access
+
+### Phase 2: Analysis 
+1. Work on trophy range patterns (notebook 2)
+2. Work on card win rates and synergy (notebook 3)
+3. Work on trophy walls (blockage) and skills progression (notebook 4)
+4. Do feature engineering to prepare for modeling (predicting who will win based on their cards combinations)  (notebook 5)
+
+**Our group used Discord to share findings with each others in group chat**
+
+### Phase 3: Modeling & Visualization
+1. Build predictive model (notebook 6)
+2. Create presentation charts (notebook 7)
+3. Export figures to `presentation/figures/` (We used Google Drive to save figures and used them in presentation later.)
+
+### Phase 4: Presentation
+1. Review and consolidate our story (what makes a champion wins the matches) (skills or money) 
+2. Create Google Slide
+3. Present our findings and sliding to Megan Bee (president of DS&AI club)  
+4. Email source code to ajsantos@cpp.edu by **11:30 AM**
+
+## Key Technical Details
+
+### Working with Large CSV
+
+We chose not loading the data to local memory. We chose to use DuckDB:
 
 ```python
 import duckdb
@@ -126,7 +156,7 @@ jupytext --set-formats ipynb,py:percent notebooks/*.ipynb
 # .ipynb stays local for execution
 ```
 
-**Best practice**: Each person owns specific notebooks to avoid conflicts.
+**Own team decided that each person will owns and work on specific notebooks to avoid conflicts.**
 
 ### Accessing Custom Utilities
 
