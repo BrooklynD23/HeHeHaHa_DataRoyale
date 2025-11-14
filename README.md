@@ -95,37 +95,6 @@ DataRoyale/
     └── slides.pptx               # Final presentation deck
 ```
 
-## Workflow
-
-### Phase 1: Setup & Exploration (Day 1)
-1. Run `00-setup-and-validation.ipynb` - Verify environment
-2. Run `01-data-profiling.ipynb` - Understand data quality
-3. Generate sample: `python create_sample.py`
-4. Upload sample to Google Drive for team access
-
-### Phase 2: Analysis (Days 2-3)
-**Divide and conquer** - assign notebooks to team members:
-- **Person 1**: `02-eda-battle-metadata.ipynb` (arenas, trophy patterns)
-- **Person 2**: `03-eda-card-analysis.ipynb` (card win rates, synergy)
-- **Person 3**: `04-eda-player-progression.ipynb` (trophy walls, skill)
-- **Person 4**: `05-feature-engineering.ipynb` (prepare data for modeling)
-
-**Daily sync**: Share findings in group chat, identify top insights
-
-### Phase 3: Modeling & Visualization (Day 4)
-1. Run `06-modeling-deck-prediction.ipynb` - Build predictive model
-2. Run `07-visualization-library.ipynb` - Create presentation charts
-3. Export figures to `presentation/figures/`
-
-### Phase 4: Presentation (Day 5 - Friday)
-1. Run `08-final-insights-synthesis.ipynb` - Consolidate story
-2. Create slide deck (PowerPoint/Google Slides)
-3. Practice presentation (aim for 7:30 to leave buffer)
-4. Email to ajsantos@cpp.edu by **11:30 AM**
-
-## Key Technical Details
-
-### Working with Large CSV
 
 **NEVER** load full CSV into memory! Always use DuckDB:
 
