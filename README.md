@@ -1,8 +1,8 @@
 # DataRoyale - Clash Royale Data Analysis Competition
 
-**Competition**: Data Science Presentation Competition
-**Deadline**: Friday the 14th, 11:30 AM
-**Judging**: Friday the 14th, 12:15 PM
+**Competition**: Data Science Presentation Competition  
+**Deadline**: Friday the 14th, 11:30 AM  
+**Judging**: Friday the 14th, 12:15 PM  
 **Format**: 8-minute presentation + 2-4 min Q&A
 
 ## Quick Start
@@ -97,37 +97,36 @@ DataRoyale/
 
 ## Workflow
 
-### Phase 1: Setup & Exploration (Day 1)
+### Phase 1: Setup & Exploration 
 1. Run `00-setup-and-validation.ipynb` - Verify environment
 2. Run `01-data-profiling.ipynb` - Understand data quality
 3. Generate sample: `python create_sample.py`
 4. Upload sample to Google Drive for team access
 
-### Phase 2: Analysis (Days 2-3)
-**Divide and conquer** - assign notebooks to team members:
-- **Person 1**: `02-eda-battle-metadata.ipynb` (arenas, trophy patterns)
-- **Person 2**: `03-eda-card-analysis.ipynb` (card win rates, synergy)
-- **Person 3**: `04-eda-player-progression.ipynb` (trophy walls, skill)
-- **Person 4**: `05-feature-engineering.ipynb` (prepare data for modeling)
+### Phase 2: Analysis 
+1. Work on trophy range patterns (notebook 2)
+2. Work on card win rates and synergy (notebook 3)
+3. Work on trophy walls (blockage) and skills progression (notebook 4)
+4. Do feature engineering to prepare for modeling (predicting who will win based on their cards combinations)  (notebook 5)
 
-**Daily sync**: Share findings in group chat, identify top insights
+**Our group used Discord to share findings with each others in group chat**
 
-### Phase 3: Modeling & Visualization (Day 4)
-1. Run `06-modeling-deck-prediction.ipynb` - Build predictive model
-2. Run `07-visualization-library.ipynb` - Create presentation charts
-3. Export figures to `presentation/figures/`
+### Phase 3: Modeling & Visualization
+1. Build predictive model (notebook 6)
+2. Create presentation charts (notebook 7)
+3. Export figures to `presentation/figures/` (We used Google Drive to save figures and used them in presentation later.)
 
-### Phase 4: Presentation (Day 5 - Friday)
-1. Run `08-final-insights-synthesis.ipynb` - Consolidate story
-2. Create slide deck (PowerPoint/Google Slides)
-3. Practice presentation (aim for 7:30 to leave buffer)
-4. Email to ajsantos@cpp.edu by **11:30 AM**
+### Phase 4: Presentation
+1. Review and consolidate our story (what makes a champion wins the matches) (skills or money) 
+2. Create Google Slide
+3. Present our findings and sliding to Megan Bee (president of DS&AI club)  
+4. Email source code to ajsantos@cpp.edu by **11:30 AM**
 
 ## Key Technical Details
 
 ### Working with Large CSV
 
-**NEVER** load full CSV into memory! Always use DuckDB:
+We chose not loading the data to local memory. We chose to use DuckDB:
 
 ```python
 import duckdb
@@ -157,7 +156,7 @@ jupytext --set-formats ipynb,py:percent notebooks/*.ipynb
 # .ipynb stays local for execution
 ```
 
-**Best practice**: Each person owns specific notebooks to avoid conflicts.
+**Own team decided that each person will owns and work on specific notebooks to avoid conflicts.**
 
 ### Accessing Custom Utilities
 
