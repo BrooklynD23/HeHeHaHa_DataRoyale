@@ -8,5 +8,6 @@ from . import duckdb_utils
 from . import feature_engineering
 from . import visualization
 from . import system_utils
+from . import temporal_features
 
-__all__ = ['duckdb_utils', 'feature_engineering', 'visualization', 'system_utils']
+__all__ = ['duckdb_utils', 'feature_engineering', 'visualization', 'system_utils', 'temporal_features']
